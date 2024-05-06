@@ -82,7 +82,8 @@ def get_street_view_images(api_key, location, size, headings, pitch=0, fov=90):
             image_data = io.BytesIO(response.content)
             images.append(Image.open(image_data))
         else:
-            raise ValueError(f'Error with Google API at location {location} - status code: {response.status_code}')
+            print(f'Error with Google API at location {location} - status code: {response.status_code}')
+            # raise ValueError(f'Error with Google API at location {location} - status code: {response.status_code}')
     return images
 
 # A few functions that are necessary to handle angles
