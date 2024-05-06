@@ -98,7 +98,8 @@ if __name__=='__main__':
             len_points = len(data_points[0]) + len(data_points[1])
             update_tracking_csv(point, len_points)
         else:
-            raise ValueError(f'Less than 5 images returned for point {point}')
+            # raise ValueError(f'Less than 5 images returned for point {point}')
+            print(f'Less than 5 images returned for point {point}')
 
         if i%50==0:
             print_status(i)
