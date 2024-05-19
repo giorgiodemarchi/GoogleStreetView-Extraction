@@ -78,7 +78,6 @@ if __name__=='__main__':
 
     i=0
     for point in points_ids:
-        print(point)
         i+=1
         data_points, metadata = generate_images(df, point, API_KEY, IMAGE_SIZE, DIRECTORY_NAME)
         
