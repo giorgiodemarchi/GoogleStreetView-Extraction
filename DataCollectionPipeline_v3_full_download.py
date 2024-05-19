@@ -11,47 +11,39 @@ def generate_images(points_df, point_id, api_key, image_size, directory_name):
     Return 5 images
     """
     p = point_id
-    coordinates = (points_df.iloc[p]['latitude'], points_df.iloc[p]['longitude'])
-    already_present, number_of_points = already_in_dataset(coordinates, directory_name)
-    # Print count once in a while
-    if number_of_points % 100 == 0:
-        print(f"Points in dataset: {number_of_points}")
+    coordinates = (points_df.loc[points_df['point_id']==p,'latitude'].item(), points_df.loc[points_df['point_id']==p,'longitude'].item())
 
-    if not already_present:
-        ###  Set headings
-        # Get a second point on the same line and compute direction
-        second_point = points_df[(points_df["street_id"] == points_df.iloc[p]["street_id"])
-                                & (points_df["point_id"] != points_df.iloc[p]["point_id"])].iloc[0]
-        second_point_coordinates = (second_point["latitude"], second_point["longitude"])
-        _, angle_baseline = calculate_orientation(coordinates, second_point_coordinates)
-        
-        ## FIRST SIDE
-        ### Do it for one side of the street
-        straight_one = angle_baseline + 90
-        headings_one = [subtract_angles(straight_one, 60), subtract_angles(straight_one, 30), straight_one, add_angles(straight_one, 30), add_angles(straight_one, 60)] 
-        street_view_images_first = get_street_view_images(api_key, coordinates, image_size, headings_one)
-        metadata_one = {'p':p, 
-                        'angle':straight_one,
-                        'latitude': coordinates[0],
-                        'longitude': coordinates[1],
-                        'headings': headings_one,
-                        'address': 'N/A'} # address}
-        
-        # SECOND SIDE
-        straight_two = angle_baseline - 90
-        headings_two = [subtract_angles(straight_two, 60), subtract_angles(straight_two, 30),  straight_two,  add_angles(straight_two, 30), add_angles(straight_two, 60)] 
-        street_view_images_second = get_street_view_images(api_key, coordinates, image_size, headings_two)
-        metadata_two = {'p':p, 
-                'angle':straight_two,
-                'latitude': coordinates[0],
-                'longitude': coordinates[1],
-                'headings': headings_two,
-                'address': 'N/A'} # address}
-
-        return [street_view_images_first, street_view_images_second], [metadata_one, metadata_two]
+    ###  Set headings
+    # Get a second point on the same line and compute direction
+    second_point = points_df[(points_df["street_id"] == points_df.loc[points_df['point_id']==p,"street_id"].item())
+                            & (points_df["point_id"] != p)].iloc[0]
+    second_point_coordinates = (second_point["latitude"], second_point["longitude"])
+    _, angle_baseline = calculate_orientation(coordinates, second_point_coordinates)
     
-    # Else
-    return None, None
+    ## FIRST SIDE
+    ### Do it for one side of the street
+    straight_one = angle_baseline + 90
+    headings_one = [subtract_angles(straight_one, 60), subtract_angles(straight_one, 30), straight_one, add_angles(straight_one, 30), add_angles(straight_one, 60)] 
+    street_view_images_first = get_street_view_images(api_key, coordinates, image_size, headings_one)
+    metadata_one = {'p':p, 
+                    'angle':straight_one,
+                    'latitude': coordinates[0],
+                    'longitude': coordinates[1],
+                    'headings': headings_one,
+                    'address': 'N/A'} # address}
+    
+    # SECOND SIDE
+    straight_two = angle_baseline - 90
+    headings_two = [subtract_angles(straight_two, 60), subtract_angles(straight_two, 30),  straight_two,  add_angles(straight_two, 30), add_angles(straight_two, 60)] 
+    street_view_images_second = get_street_view_images(api_key, coordinates, image_size, headings_two)
+    metadata_two = {'p':p, 
+            'angle':straight_two,
+            'latitude': coordinates[0],
+            'longitude': coordinates[1],
+            'headings': headings_two,
+            'address': 'N/A'} # address}
+
+    return [street_view_images_first, street_view_images_second], [metadata_one, metadata_two]
 
 def update_tracking_csv(point, len_points):
     """
@@ -81,11 +73,13 @@ if __name__=='__main__':
     # df = pd.read_csv('../Data/LocationSamplingDataset/FullDetroitPointsDataset_v2.csv', index_col=0)[['point_id', 'street_id', 'longitude', 'latitude']]
     
     df = pd.read_csv('pipe_tracking.csv', index_col=0)
-    
-    points_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)].point_id.unique()
+    df = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)]
+
+    points_ids = df.point_id.unique()
 
     i=0
     for point in points_ids:
+        print(point)
         i+=1
         data_points, metadata = generate_images(df, point, API_KEY, IMAGE_SIZE, DIRECTORY_NAME)
         
