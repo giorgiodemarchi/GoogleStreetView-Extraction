@@ -73,9 +73,8 @@ if __name__=='__main__':
     # df = pd.read_csv('../Data/LocationSamplingDataset/FullDetroitPointsDataset_v2.csv', index_col=0)[['point_id', 'street_id', 'longitude', 'latitude']]
     
     df = pd.read_csv('pipe_tracking.csv', index_col=0)
-    df = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)]
 
-    points_ids = df.point_id.unique()
+    points_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)].point_id.unique()
 
     i=0
     for point in points_ids:
