@@ -74,8 +74,12 @@ if __name__=='__main__':
     
     df = pd.read_csv('pipe_tracking.csv', index_col=0)
 
-    points_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)].point_id.unique()
+    # points_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)].point_id.unique()
+    sampled = pd.read_csv('cov-shift-extraction.csv', index_col=0)
 
+    to_extract = sampled[sampled['In Dataset']==0]['point_id'].unique()
+    points_ids = df[(df['points_in_street']!=1) & (df['point_id'].isin(to_extract))].point_id.unique()
+    print(len(points_ids))
     i=0
     for point in points_ids:
         i+=1
