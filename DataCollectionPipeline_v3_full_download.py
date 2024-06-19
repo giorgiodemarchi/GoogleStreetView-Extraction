@@ -83,6 +83,8 @@ if __name__=='__main__':
 
     points_ids = df[df['street_id'].isin(street_ids)].point_id.unique()
 
+    print(len(points_ids))
+
     i=0
     for point in points_ids:
         i+=1
