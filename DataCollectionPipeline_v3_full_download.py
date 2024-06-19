@@ -74,7 +74,14 @@ if __name__=='__main__':
     
     df = pd.read_csv('pipe_tracking.csv', index_col=0)
 
-    points_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1)].point_id.unique()
+    # Neighborhoods to extract data for 
+    neighborhoods = ['Midtown', 'Corktown', 'North Corktown', 'Lafayette Park', 'Elmwood Park', 'Brush Park', 
+                        'Brewster Homes', 'Medical Center', 'Forest Park', 'Jeffries', 'Wayne State', 'Cultural Center'] #3.3k points
+
+
+    street_ids = df[(df['In Dataset']!=1) & (df['points_in_street']!=1) & (df['nhood_name'].isin(neighborhoods))].street_id.unique()
+
+    points_ids = df[df['street_id'].isin(street_ids)].point_id.unique()
 
     i=0
     for point in points_ids:
